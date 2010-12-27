@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>test console</title>
+	<meta name="generator" content="TextMate http://macromates.com/">
+	<meta name="author" content="Jan Tuitman">
+	<!-- Date: 2010-07-10 -->
+	<script src="scripts/jquery-1.4.2.js"></script>
+	<script src="scripts/json.js"></script>
+	<script>
+			function Send() {
+				
+				var jsonStr=$("#inputField").val();
+				try {
+					eval("var a = "+jsonStr);
+				}
+				catch(e) {
+					alert("Fout in json: \n"+e.message);
+					return;
+				}
+				var functionName=$("#functionName").val();
+				$.ajax({
+				  url: "/ajax/"+functionName,
+				  type: 'POST',
+				  dataType: 'json',
+				  data: jsonStr,
+				  success: function(result) {
+				     $("#resultDiv").html("uitkomst: "+result);  	
+				  }
+				});
+			}
+			
+			function loadTemplate() {
+				var o={};
+				var s='';
+				var functionName=$("#functionName").val();
+				if (functionName=='addUser') {
+					o = {
+						name: 'Pietje',
+						email: 'Pietje@gmail.com',
+					}
+				}
+				if (functionName=='verifyUser') {
+					o = {
+						email: 'Pietje@gmail.com',
+						password: 'welkom01'
+					}
+				}
+				if (functionName=='deleteUser') {
+					o = {
+						email: 'Pietje@gmail.com',
+					}
+				}
+				
+				
+				s=JSON.stringify(o,null,3);
+				$("#inputField").val(s)
+			}
+	
+	</script>
+</head>
+<body>
+	<div>
+		<select id="functionName">
+			<option value="addUser">addUser</option>
+		</select>
+		<input type="button" value="load template" onclick="loadTemplate()" />
+	</div>
+    <textarea id="inputField" style="width:500px;height:250px"></textarea>
+    <hr/>
+    <input type="button" value="Send" onclick="Send()" />
+    <div id="resultDiv"></div> 
+</body>
+</html>
