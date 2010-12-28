@@ -13,9 +13,16 @@ import java.lang.Class;
 import scala.collection.mutable.HashMap;
 import net.liftweb.json.JsonParser._;
 import net.liftweb.json.JsonAST._;
+import net.liftweb.json._;
+import net.liftweb.json.Printer;
+
+import org.tuitman.statelesswf.reflection.Reflection._;
+
+import java.io.PrintWriter;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import scala.io.Source;
+
 /*
 class AjaxService extends HttpServlet {
 	
@@ -106,7 +113,7 @@ abstract class AjaxFn {
 
 
 abstract class AjaxClass {
-	def ajaxMethod[T] (function : (T) => String ) (implicit mf : Manifest[T]): Function[JValue,String] = {
+	def ajaxMethod[T] (clazz: Class[T])(function : (T) => String ) (implicit mf : Manifest[T]): (Function[JValue,String],Class[T]) =( {
 		(x : JValue) =>
 		
 		//import scala.reflect._;
@@ -122,7 +129,7 @@ abstract class AjaxClass {
 		
 		val x2=x.extract[T](formats,mf);
 		function(x2) ;
-	}
+	},clazz);
 }
 
 /*
@@ -145,7 +152,7 @@ abstract class AjaxClass {
 */
 
 class AjaxDispatcher {
-	var functionList : HashMap[String,Function[JValue,String]] = new HashMap[String,Function[JValue,String]];
+	var functionList : HashMap[String,Tuple2[Function[JValue,String],Class[_]]] = new HashMap[String,Tuple2[Function[JValue,String],Class[_]]];
 	var ajaxInstance : Any=null;
 	
 	def init(className : String) {
@@ -154,16 +161,20 @@ class AjaxDispatcher {
 	   val list=List.fromArray(ajaxClass.getMethods());
 	   for (method <- list if (method.getDeclaringClass() == ajaxClass)) {
 	        println(method.getName());
-	        functionList	+= method.getName() -> method.invoke(ajaxInstance).asInstanceOf[Function[JValue,String]];
+	        functionList	+= method.getName() -> method.invoke(ajaxInstance).asInstanceOf[Tuple2[Function[JValue,String],Class[_]]];
 	   }
 	   //functionList.keySet.foreach (println);
 	}
 	
-	def dispatch(path : List[String],req : HttpServletRequest, resp: HttpServletResponse) {
+	def dispatch(path : List[String],req : HttpServletRequest, resp: HttpServletResponse) : Unit = {
 		val s=path.head;
-		if (functionList isDefinedAt(s)) {
+		if ( s =="ajaxConsole") {
+			val out=resp.getWriter();
+			makeAjaxConsole(out);
+		}
+		else if (functionList isDefinedAt(s)) {
 			println("method "+s+" exists!");
-		  	val fn=functionList(s).asInstanceOf[Function[JValue,String]];
+		  	val (fn,clazz)=functionList(s).asInstanceOf[Tuple2[Function[JValue,String],Class[_]]];
 
 
 		    //var line : String = Source.fromInputStream(req.getInputStream()).getLines.reduceLeft(_ + _);
@@ -187,6 +198,99 @@ class AjaxDispatcher {
 		else  {
 		    resp.sendError(HttpServletResponse.SC_NOT_FOUND,"this ajaxcall does not exist.");
 		}
+	}
+	
+	
+	/*
+	   string -> string field
+	   int -> number field
+	   list<object> -> makeJsonExample(object) : and then wrapped in an JArray.
+	   object -> makeJsonExample(classOf(object)) : and then as JObject field.
+	*/
+	def makeJsonExample(clazz : Class[_]) : JValue = {
+        
+        def classFromListType(gentype : ParameterizedType) : Class[_] = {
+			if (gentype.toString.endsWith("List")) {
+				throw new RuntimeException("expecting a list class, cant handle "+gentype);
+			}
+			else {
+				gentype.getActualTypeArguments()(0).asInstanceOf[Class[_]];
+			}
+        }
+
+        //val methods = for(m <- clazz.getMethods() if (m.getDeclaringClass() == clazz ) yield m;
+		val list = primaryConstructorArgs(clazz).map( { 
+			case (name,clss,genericType) => 
+				if (genericType.isInstanceOf[ParameterizedType]) {
+					val arrayElement=makeJsonExample(classFromListType(genericType.asInstanceOf[ParameterizedType]));
+					JField(name,JArray(
+							List(arrayElement,arrayElement)
+						)
+					);
+				}
+				else if (clss.isInstanceOf[Class[String]]) {
+					JField(name,JString("String"))
+				}
+				else if (clss.isInstanceOf[Class[Int]]) {
+					JField(name,JInt(1))
+				}
+				else {
+					// object type.
+					JField(name,makeJsonExample(clss));
+				}	
+		}) ;
+		JObject(list);
+	}
+
+/*
+*/	
+	def makeAjaxConsole(out : PrintWriter) {
+		out.println("<html><head><title>ajaxConsole</title>");
+		out.println("""
+		<script src="/scripts/jquery-1.4.2.js"></script>
+		<script src="/scripts/json.js"></script>
+		<script src="/scripts/ajaxConsole.js"></script>
+		<body>""");
+		out.println("<div><select id=\"functionName\" onchange=\"g_ajaxConsole.loadTemplate(this)\" >")
+		out.println("<option value=\"\" SELECTED>select ajax function</option>");
+		for((name,value) <- functionList) {
+			out.println("<option value=\""+name+"\">"+name+"</option>");
+			value match {
+				case Tuple2(function,clazz) => {
+					// hmmmm...
+					val json=makeJsonExample(clazz);
+					out.println("<script>g_ajaxConsole.addTemplate('"+name+"','"+Printer.compact(render(json))+"')</script>")
+					
+					/*
+					val constructor=clazz.getConstructors()(0);
+					println("For method "+name+" found a constructorwith the arguments:");
+					for(param <- constructor.getGenericParameterTypes()) {
+						if (param.isInstanceOf[ParameterizedType]) {
+		                    val x=param.asInstanceOf[ParameterizedType];
+							println("generic param of type:" +x.getRawType().asInstanceOf[Class[Any]].getName());
+		                    for (parameterclass <- x.getActualTypeArguments ) {
+		                         println("typeargument "+parameterclass.toString());
+		                         // lets look if this thing has a constructor.
+		                         val nested=parameterclass.asInstanceOf[Class[Any]].getConstructors()(0);
+		                         for (n2 <- nested.getParameterTypes()) {
+			                        println("...."+n2.toString());
+		                         }
+		                    }
+						}
+						else {
+							println(" param of type: "+param.asInstanceOf[Class[Any]].getName())
+						}
+					}
+					*/
+				}
+				case _ => {}
+			}
+		}
+		out.println("</select></div>");
+		out.println("""<textarea id="ajaxInput" style="width:500px;height:250px"></textarea>""")
+		
+		out.println("</body>");
+		
 	}
 }
 
