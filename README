@@ -1,20 +1,22 @@
-This is my gazzilionth attempt at a web framework that is reusable after one app is being built with it. The reason why I am not very happy with existing frameworks, is that they start from the server side.
-I, as a javascript junkie, wants to start client side.
+Lift, Wicket, Ruby on Rails, ... are great web frameworks. But all of them have their controllers on the server side, making them essential server side frameworks (even though they all have ajax support).
 
-However, I need a serious language on the server too. I don't like javascript on the server, need to have much libraries. Since I am very familiar with the java platform, but don't like the java language too much, I have picked Scala.
+I want to make a client side framework. This is an experimental repository for now. The code is written in scala + javascript and the database is mongodb.I borrow some stuff from the Lift Web Framework (since this is written in scala). 
 
-I borrow some stuff from the Lift Web Framework (since this is written in scala). But I don't want to learn Lift, looks to big and complicated for my needs.
+Finished:
+- extremely easy way to make ajax calls, including client side proxy.
+- prove of concept implementation of mongodb serialization.
 
+Still todo:
+- maven archetypes
+- code cleanup/ separation library code and project code.
+- improve error handling of ajax call.
+- handle default url /
+- generic db code?
+- views
 
-So here is the plan:
-- all views are just plain html using jquery and javascript as helpers. Maybe some templates to wrap html fragments into page templates, like in Lift.
-- all communication happens by ajax to one servlet.
-- the servlet dispatches the calls to scala classes. they accessses the mongodb database. 
  
-
 Future goals:
 - something for i18n, and for view based on user-agent ( to change views depending on user-agent settings).
 - something for nice urls.
-- that's about it.... this is not being a big framework, need should be inside. 
+- that's about it.... this is not a big framework. Just a minimal one to get a nice ajax app up and running and do some really really rapid development.
 
-Okay, lets get started!
