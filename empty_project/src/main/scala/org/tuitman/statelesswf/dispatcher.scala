@@ -15,16 +15,21 @@ class Dispatcher extends Filter {
     override def init(config : FilterConfig) {
 	   ajaxDispatcher = new AjaxDispatcher ;
 	   ajaxDispatcher.init(config.getInitParameter("ajaxClass"));
+	   // add configuration here.
     }
 
 	override def doFilter(request: ServletRequest, response: ServletResponse,chain :FilterChain) {
 		val req = request.asInstanceOf[HttpServletRequest] ;
 		val resp = response.asInstanceOf[HttpServletResponse] ;
 		
-		val arrPath=List.fromArray(req.getRequestURI().split("/")) tail;
-        // TODO: protect against nullpointerexception when no slashes in uri. 
-		if (arrPath.head == "ajax") {
-			ajaxDispatcher.dispatch(arrPath.tail,req,resp)
+		val path=List.fromArray(req.getRequestURI().split("/"));
+		val path2 = if (path.length == 0) {
+			List("index.html")
+		} else {
+		 path tail;
+		}
+		if (path2.head == "ajax") {
+			ajaxDispatcher.dispatch(path2.tail,req,resp)
 		}
 		else {
 			// forward the call to the chain. 

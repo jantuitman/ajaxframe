@@ -1,5 +1,7 @@
 package myapp.ajax;
 import org.tuitman.statelesswf.AjaxClass;
+import org.tuitman.statelesswf.authorisation._;
+
 import net.liftweb.mongodb._;
 import net.liftweb.json.JsonDSL._;
 import com.mongodb.DBObject;
@@ -16,7 +18,7 @@ object User extends MongoDocumentMeta[User] {
 
 class UserCalls extends AjaxClass {
 		
-	val addUser = ajaxMethod[User,User] { 
+	val addUser = ajaxMethod[User,User](Unauth()) { 
 		( u : User) => u match {
 			case User(id,name,email,list) => {
 				User(null,name,email,list).save ;
@@ -26,20 +28,20 @@ class UserCalls extends AjaxClass {
 	}  
 
 
-	val findUserByName = ajaxMethod[User,List[User]] {
+	val findUserByName = ajaxMethod[User,List[User]] (Unauth()) {
 		( u : User) =>
 
 		User.findAll("name" -> u.name);
 	}
 
-	val allUsers = ajaxMethod[User,List[User]] {
+	val allUsers = ajaxMethod[User,List[User]] (Unauth()) {
 		( u : User) =>
     
 	    User.findAll(JObject(Nil));	
 	}
 
 
-	val updateUser = ajaxMethod[User,User] {
+	val updateUser = ajaxMethod[User,User] (Unauth()) {
 		( u : User) =>
     
 	    User.update("name" -> u.name,u );
@@ -48,7 +50,7 @@ class UserCalls extends AjaxClass {
 	}
 
 
-	val deleteUser= ajaxMethod[User,User] {
+	val deleteUser= ajaxMethod[User,User] (Unauth()) {
 		( u : User) =>
     
 	    User.find("name" -> u.name) match {

@@ -11,14 +11,19 @@ import net.liftweb.json.JsonAST._;
 import net.liftweb.json.Printer;
 
 import java.io.PrintWriter;
+import org.tuitman.statelesswf.authorisation._;
 
 
+
+case class AjaxHttpContext(req : HttpServletRequest, resp: HttpServletResponse ) ;
 
 
 class AjaxDispatcher {
+
+	type AjaxDescriptor = Tuple4[Class[_],Class[_],AppRole,Function2[Reader,AjaxHttpContext,String]];
 	
 	//private var ajaxInstance : Any = null;
-	private var functionList = new HashMap[String,Tuple3[Class[_],Class[_],Function1[Reader,String]]];
+	private var functionList = new HashMap[String,AjaxDescriptor];
 	
 	def init(className : String) : Unit = synchronized {
 		
@@ -33,7 +38,7 @@ class AjaxDispatcher {
 						val ajaxInstance=x.newInstance();
 						retrieveMethods(x,ajaxInstance);
 					}
-					case  ajaxDescriptor : Tuple3[Class[_],Class[_],Function1[Reader,String]] => {
+					case  ajaxDescriptor : AjaxDescriptor => {
 						functionList	+= method.getName() -> ajaxDescriptor;
 					}
 					case _ => {
@@ -62,8 +67,8 @@ class AjaxDispatcher {
 			}
 			case s : String => {
 				functionList(s) match {
-					case (_,_,fn : Function1[Reader,String]) => {
-						resp.getWriter.println(fn(new InputStreamReader(req.getInputStream())))	
+					case (_,_,_,fn : Function2[Reader,AjaxHttpContext,String]) => {
+						resp.getWriter.println(fn(new InputStreamReader(req.getInputStream()),AjaxHttpContext(req,resp)))	
 					}
 					case _ => resp.sendError(HttpServletResponse.SC_NOT_FOUND,"this ajaxcall does not exist.");
 				}
@@ -133,7 +138,7 @@ class AjaxDispatcher {
 		for((name,value) <- functionList) {
 			out.println("<option value=\""+name+"\">"+name+"</option>");
 			value match {
-				case (input : Class[_],output,function) => {
+				case (input : Class[_],output,role,function) => {
 					// hmmmm...
 					val json=makeJsonExample(input);
 					out.println("<script>g_ajaxConsole.addTemplate('"+name+"','"+Printer.compact(render(json))+"')</script>")
@@ -160,7 +165,7 @@ class AjaxDispatcher {
 	    var methods = List[String]();
 	    for((name,value) <- functionList) {
 			value match {
-				case (input : Class[_],output,function) => {
+				case (input : Class[_],output,role,function) => {
 					val json=makeJsonExample(input);
 					val s=name + ": new AjaxCallTemplate('"+name+"',"+Printer.compact(render(json))+")" 
 					methods = s :: methods ;
