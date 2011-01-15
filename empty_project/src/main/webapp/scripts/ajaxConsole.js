@@ -32,6 +32,7 @@ AjaxConsole.prototype.addTemplate=function(name,value){
 
 AjaxConsole.prototype.sendRequest=function(functionName,inputField,outputDiv) {
 	var jsonStr=inputField.val();
+	outputDiv.html('');
 	try {
 		eval("var a = "+jsonStr);
 	}
@@ -39,6 +40,20 @@ AjaxConsole.prototype.sendRequest=function(functionName,inputField,outputDiv) {
 		alert("Fout in json: \n"+e.message);
 		return;
 	}
+	
+	
+	Ajax[functionName].call(a,
+		function (result) {
+			console.debug(result);
+	        outputDiv.html("call result: "+JSON.stringify(result,null,3));  	
+		},
+		function (x) {
+			outputDiv.html("<span style='color:red;font-weight:bolder'>ERROR: "+x.status+"</span> "+x.statusText);
+		}
+	);
+	
+	
+    /*	
 	$.ajax({
 	  url: "/ajax/"+functionName,
 	  type: 'POST',
@@ -48,6 +63,7 @@ AjaxConsole.prototype.sendRequest=function(functionName,inputField,outputDiv) {
 	     outputDiv.html("call result: "+JSON.stringify(result,null,3));  	
 	  }
 	});
+	*/
 }
 
 

@@ -8,14 +8,7 @@ import com.mongodb.DBObject;
 import net.liftweb.json.JsonAST.JObject;
 
 
-
-
-abstract class AppRole;
-
-/* for unauthenticated users */
-case class Unauth extends AppRole; 
-case class AuthRole(roleName : String) extends AppRole;
-case class AdminRole extends AppRole;
+case class AuthRole(roleName : String) ;
 
 case class AjaxAuthentication(email : String, password : String);
 case class AjaxAuthenticationResponse(message : String);
@@ -37,13 +30,16 @@ class DefaultAuthentication extends AjaxClass {
 
 
 
-	def login  =ajaxContextAwareMethod[AjaxAuthentication,AjaxAuthenticationResponse](Unauth()) {
+	def login  =ajaxContextAwareMethod[AjaxAuthentication,AjaxAuthenticationResponse] (AuthRole("none")) {
 			( auth : AjaxAuthentication, ctx: AjaxHttpContext) => 
 			
 			
 			
 			AppUser.find(("email" -> auth.email ) ~ ("password" -> Digester.sha1digest(auth.password))) match {
 				case Some(AppUser(_id,email,password,roles)) =>
+					val session=ctx.req.getSession(true);
+					session.setAttribute("userId",_id);
+					session.setAttribute("userRoles",roles);
 					AjaxAuthenticationResponse("Logged in!");
 				case None => {
 					AjaxAuthenticationResponse("Unknown user/password");
@@ -51,20 +47,33 @@ class DefaultAuthentication extends AjaxClass {
 			}
 	}
 
-	def register = ajaxContextAwareMethod[AjaxAuthentication,AjaxAuthenticationResponse](Unauth()) {
+	def register = ajaxContextAwareMethod[AjaxAuthentication,AjaxAuthenticationResponse](AuthRole("none")) {
 		( auth : AjaxAuthentication,ctx: AjaxHttpContext) => AjaxAuthenticationResponse("registered now!")
 		AppUser.find("email" -> auth.email) match {
 			case Some(AppUser(_id,email,digestedPassword,roles)) =>
 				AjaxAuthenticationResponse("User already exists!");
 			case None => {
-				AppUser(null,auth.email,Digester.sha1digest(auth.password),List(AuthRole("user"))).save ;
-				AjaxAuthenticationResponse("User registered");
+				val roles = List(AuthRole("user"));
+				AppUser(null,auth.email,Digester.sha1digest(auth.password),roles).save ;
+				AppUser.find(("email" -> auth.email ) ~ ("password" -> Digester.sha1digest(auth.password))) match {
+					case Some(AppUser(_id,email,password,roles)) =>
+						val session=ctx.req.getSession(true);
+						session.setAttribute("userId",_id);
+						session.setAttribute("userRoles",roles);
+						AjaxAuthenticationResponse("User registered!");
+					case None => {
+						AjaxAuthenticationResponse("Internal errror");
+					}
+				}
 			}
 		}
 	
 	}
 
-	def logout = ajaxContextAwareMethod[AjaxAuthentication,AjaxAuthenticationResponse](AuthRole("*")) {
-		( v : AjaxAuthentication,ctx: AjaxHttpContext) => AjaxAuthenticationResponse("logged out now!")
+	def logout = ajaxContextAwareMethod[AjaxAuthentication,AjaxAuthenticationResponse](AuthRole("user")) {
+		( v : AjaxAuthentication,ctx: AjaxHttpContext) => 
+		val session=ctx.req.getSession(true);
+		session.invalidate();		
+		AjaxAuthenticationResponse("logged out now!")
 	}
 }

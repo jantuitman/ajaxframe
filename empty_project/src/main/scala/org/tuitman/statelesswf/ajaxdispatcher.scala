@@ -20,7 +20,7 @@ case class AjaxHttpContext(req : HttpServletRequest, resp: HttpServletResponse )
 
 class AjaxDispatcher {
 
-	type AjaxDescriptor = Tuple4[Class[_],Class[_],AppRole,Function2[Reader,AjaxHttpContext,String]];
+	type AjaxDescriptor = Tuple4[Class[_],Class[_],AuthRole,Function2[Reader,AjaxHttpContext,String]];
 	
 	//private var ajaxInstance : Any = null;
 	private var functionList = new HashMap[String,AjaxDescriptor];
@@ -54,6 +54,39 @@ class AjaxDispatcher {
 	}
 	
 	def dispatch(path : List[String],req : HttpServletRequest, resp: HttpServletResponse) : Unit = {
+		
+		def withAuthorisation(role : AuthRole, ctx : AjaxHttpContext)(fn : AjaxHttpContext => Unit) {
+			role match {
+				case AuthRole("none") => fn(ctx);
+				case r : AuthRole => {
+					val session=ctx.req.getSession(true);
+					session.getAttribute("userRoles") match {
+						case l: List[AuthRole] =>  {
+							if (l.contains(role)) {
+								try 
+								{
+									fn(ctx);
+								}
+								catch {
+									case e : Throwable => {
+										resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR," an error occured in the execution of the ajax call");
+										throw new RuntimeException(e);
+									}
+								}
+							}
+							else {
+								resp.sendError(HttpServletResponse.SC_FORBIDDEN," Authorisation failure");
+							}
+						}
+						case _ => {
+							resp.sendError(HttpServletResponse.SC_FORBIDDEN," Authorisation failure");
+						}
+					}
+				} 
+			}
+		}
+		
+		
 		val s=path.head;
 		s match {
 			case "ajaxConsole" => {
@@ -66,9 +99,12 @@ class AjaxDispatcher {
 				makeAjaxProxy(out);
 			}
 			case s : String => {
+				val ctx = AjaxHttpContext(req,resp)
 				functionList(s) match {
-					case (_,_,_,fn : Function2[Reader,AjaxHttpContext,String]) => {
-						resp.getWriter.println(fn(new InputStreamReader(req.getInputStream()),AjaxHttpContext(req,resp)))	
+					case (_,_,role,fn : Function2[Reader,AjaxHttpContext,String]) => {
+						withAuthorisation(role,ctx) { ctx : AjaxHttpContext =>
+							resp.getWriter.println(fn(new InputStreamReader(ctx.req.getInputStream()),ctx))	
+						}
 					}
 					case _ => resp.sendError(HttpServletResponse.SC_NOT_FOUND,"this ajaxcall does not exist.");
 				}
@@ -124,8 +160,12 @@ class AjaxDispatcher {
 		out.println("<html><head><title>ajaxConsole</title>");
 		out.println("""
 		<script src="/scripts/jquery-1.4.2.js"></script>
+		<script src="/scripts/jquery.templ.js"></script>
 		<script src="/scripts/json.js"></script>
+		<script src="/scripts/templating.js"></script>
 		<script src="/scripts/ajaxConsole.js"></script>
+		<script src="/scripts/ajaxLib.js"></script>
+		<script src="/ajax/ajaxProxy.js"></script>
 		<script>
 		     function sendReq() {
 					g_ajaxConsole.sendRequest($('#functionName').val(),$('#ajaxInput'),$('#ajaxOutput'))				

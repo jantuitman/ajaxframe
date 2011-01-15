@@ -1,25 +1,38 @@
+if (typeof Ajax == "undefined") Ajax={};
+
 function AjaxCallTemplate(name,example) {
 	this.name=name;
 	this.example=example;
+	this.authhandler=new AuthorisationHandler();
 }
 
-AjaxCallTemplate.prototype.call=function(param,success,error) {
+AjaxCallTemplate.prototype.call=function(param,success,error,authhandler) {
 	var self=this;
+	if (authhandler==null) authhandler=this.authhandler;
 	var d=JSON.stringify(param,function(k,v) { if (v==null) return null ; else return v;},3);
-	alert(d)
 	$.ajax({
 	  url: "/ajax/"+this.name,
 	  type: 'POST',
 	  dataType: 'json',
 	  data: d,
 	  success: function(result) {
+	     // check if callback is defined.
 	     if (success) {
 		     success(result);
 	     }
 	     else alert("unhandled call result in ajaxcall '"+name+"': "+JSON.stringify(result,null,3)); 
 	  },
 	  error: function(result) {
-		 alert("error in AjaxCall "+result);
+		 if (result.status == 403) {
+		  	if (authhandler.handle403) {
+				 /* handle the 403 (which will present a login screen ) and when done, 
+				    reexecute the call.
+				 */ 
+			     authhandler.handle403(function (){
+					self.call(param,success,error,authhandler)
+			     },error);
+		    }
+		 } 
 		 if (error) error(result) ;
 		 else {
 			self.defaultErrorHandler(result);
@@ -72,5 +85,37 @@ AjaxCallTemplate.prototype.param=function(raw) {
 
 
 AjaxCallTemplate.prototype.defaultErrorHandler=function(result) {
-	alert("error in ajaxCall::: "+result);
+	alert("error ajaxCall: "+result.status+" "+result.statusText);
 }
+
+
+/****** authorisation stuff *****/
+
+function AuthorisationHandler() {
+	
+}
+
+AuthorisationHandler.prototype.handle403=function(success, error) {
+
+
+	Templating.render('login.html',{},function (h) {
+			h.appendTo('body');
+			$('#loginform',h).submit(function () {
+				Ajax.login.call(Templating.extractJson(h,{ 'email': null, 'password': null}),
+						function (result) {
+							
+							if (result.message != 'Logged in!') {
+								$("#msg",h).html(result.message);
+							}
+							else {
+								h.remove();
+								success();
+							}
+						}
+				)
+				return false;
+			})
+	})
+}
+
+

@@ -1,13 +1,13 @@
 package org.tuitman.statelesswf;
 import java.io.Reader;
 import java.lang.reflect.Method;
-import org.tuitman.statelesswf.authorisation.AppRole;
+import org.tuitman.statelesswf.authorisation.AuthRole;
 
 
 abstract class AjaxClass {
 	
 	
-	def ajaxMethod[Input,Output <: AnyRef] (role: AppRole) ( func : (Input) => Output) (implicit mf : Manifest[Input])
+	def ajaxMethod[Input,Output <: AnyRef] (role: AuthRole) ( func : (Input) => Output) (implicit mf : Manifest[Input])
 	    : AjaxDispatcher#AjaxDescriptor = {
 			val extractor=new JsonExtractor[Input,Output];
 			
@@ -28,7 +28,7 @@ abstract class AjaxClass {
 	}
 
 	
-	def ajaxContextAwareMethod[Input,Output <: AnyRef] (role: AppRole) ( func : (Input,AjaxHttpContext) => Output) (implicit mf : Manifest[Input])
+	def ajaxContextAwareMethod[Input,Output <: AnyRef] (role: AuthRole) ( func : (Input,AjaxHttpContext) => Output) (implicit mf : Manifest[Input])
 	    : AjaxDispatcher#AjaxDescriptor = {
 
 			val extractor=new JsonExtractor[Input,Output];

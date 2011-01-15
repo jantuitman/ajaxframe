@@ -18,7 +18,7 @@ object User extends MongoDocumentMeta[User] {
 
 class UserCalls extends AjaxClass {
 		
-	val addUser = ajaxMethod[User,User](Unauth()) { 
+	val addUser = ajaxMethod[User,User](AuthRole("none")) { 
 		( u : User) => u match {
 			case User(id,name,email,list) => {
 				User(null,name,email,list).save ;
@@ -28,20 +28,20 @@ class UserCalls extends AjaxClass {
 	}  
 
 
-	val findUserByName = ajaxMethod[User,List[User]] (Unauth()) {
+	val findUserByName = ajaxMethod[User,List[User]] (AuthRole("user")) {
 		( u : User) =>
 
 		User.findAll("name" -> u.name);
 	}
 
-	val allUsers = ajaxMethod[User,List[User]] (Unauth()) {
+	val allUsers = ajaxMethod[User,List[User]] (AuthRole("none")) {
 		( u : User) =>
     
 	    User.findAll(JObject(Nil));	
 	}
 
 
-	val updateUser = ajaxMethod[User,User] (Unauth()) {
+	val updateUser = ajaxMethod[User,User] (AuthRole("none")) {
 		( u : User) =>
     
 	    User.update("name" -> u.name,u );
@@ -50,7 +50,7 @@ class UserCalls extends AjaxClass {
 	}
 
 
-	val deleteUser= ajaxMethod[User,User] (Unauth()) {
+	val deleteUser= ajaxMethod[User,User] (AuthRole("none")) {
 		( u : User) =>
     
 	    User.find("name" -> u.name) match {
