@@ -5,18 +5,19 @@ I want to make a client side framework. This is an experimental repository for n
 Finished:
 - extremely easy way to make ajax calls, including client side proxy.
 - prove of concept implementation of mongodb serialization.
+- handle default url /
+- improve error handling of ajax call.
+- views
+
 
 Still todo:
 - maven archetypes
 - code cleanup/ separation library code and project code.
-- improve error handling of ajax call.
-- handle default url /
 - generic db code?
-- views
+- something for i18n, and for view based on user-agent ( to change views depending on user-agent settings).
 
  
 Future goals:
-- something for i18n, and for view based on user-agent ( to change views depending on user-agent settings).
 - something for nice urls.
 - that's about it.... this is not a big framework. Just a minimal one to get a nice ajax app up and running and do some really really rapid development.
 
