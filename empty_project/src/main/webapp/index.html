@@ -3,13 +3,13 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>index</title>
 	<script src="/scripts/jquery-1.4.2.js"></script>
-	<script src="/scripts/ajaxLib.js"></script>
+	<script src="/scripts/ajaxFrame.js"></script>
 	<script src="/ajax/ajaxProxy.js"></script>
 	<script>
 	
 	
 	     function test() {
-		 	Ajax.addUser.call(Ajax.addUser.param({ name: 'Pietje'}), function (result) {
+		 	AjaxFrame.Ajax.addUser.call(AjaxFrame.Ajax.addUser.param({ name: 'Pietje'}), function (result) {
 				alert("User Pietje was added to the database.")
 		    });
 	     }

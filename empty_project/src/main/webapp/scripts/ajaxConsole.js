@@ -1,7 +1,10 @@
-var g_ajaxConsole=new AjaxConsole();
+if (!AjaxFrame) {
+	AjaxFrame={}
+}
 
+(function (global) {
 
-function AjaxConsole() {
+var AjaxConsole=function() {
 	
 	this.ajaxTemplates={};
 	
@@ -42,7 +45,7 @@ AjaxConsole.prototype.sendRequest=function(functionName,inputField,outputDiv) {
 	}
 	
 	
-	Ajax[functionName].call(a,
+	AjaxFrame.Ajax[functionName].call(a,
 		function (result) {
 			console.debug(result);
 	        outputDiv.html("call result: "+JSON.stringify(result,null,3));  	
@@ -65,5 +68,6 @@ AjaxConsole.prototype.sendRequest=function(functionName,inputField,outputDiv) {
 	});
 	*/
 }
+   if (typeof global.Console == "undefined" ) global.Console=new AjaxConsole();
 
-
+})(AjaxFrame)

@@ -161,38 +161,42 @@ class AjaxDispatcher {
 		out.println("""<script src="/scripts/jquery-1.4.2.js"></script>
 		<script src="/scripts/jquery.templ.js"></script>
 		<script src="/scripts/json.js"></script>
+		<script src="/scripts/ajaxFrame.js"></script>
 		<script src="/scripts/templating.js"></script>
 		<script src="/scripts/ajaxConsole.js"></script>
-		<script src="/scripts/ajaxLib.js"></script>
 		<script src="/ajax/ajaxProxy.js"></script>
 		<script>
 		     function sendReq() {
-					g_ajaxConsole.sendRequest($('#functionName').val(),$('#ajaxInput'),$('#ajaxOutput'))				
+					AjaxFrame.Console.sendRequest($('#functionName').val(),$('#ajaxInput'),$('#ajaxOutput'))				
 		     }
-		
+		     
 		</script>
 		<body>
 		<div id="mainDiv">
 		""");
-		out.println("<div><select id=\"functionName\" onchange=\"g_ajaxConsole.loadTemplate(this)\" >")
+		out.println("<div><select id=\"functionName\" onchange=\"AjaxFrame.Console.loadTemplate(this)\" >")
 		out.println("<option value=\"\" SELECTED>select ajax function</option>");
+		var templates : List[String]=List();
 		for((name,value) <- functionList) {
 			out.println("<option value=\""+name+"\">"+name+"</option>");
 			value match {
 				case (input : Class[_],output,role,function) => {
 					// hmmmm...
 					val json=makeJsonExample(input);
-					out.println("<script>g_ajaxConsole.addTemplate('"+name+"','"+Printer.compact(render(json))+"')</script>")
+					templates ::= "AjaxFrame.Console.addTemplate('"+name+"','"+Printer.compact(render(json))+"')"
 
 				}
 				case _ => {}
 			}
 		}
 		out.println("</select></div>");
+		out.println("<script>function addTemplates() {\n"+templates.mkString("\n")+"""
+		}
+		$(document).ready(addTemplates);
+		</script>""");
 		out.println("""
 		<textarea id="ajaxInput" style="width:500px;height:250px">&nbsp;</textarea><br/>
 		<input type="button" onclick="sendReq()" value="Send" /><br/>
-		<input type="button" onclick="alert('there!')" value="test" />
 		<hr/>
 		<div id="ajaxOutput" ></div>
 		""")
@@ -202,13 +206,13 @@ class AjaxDispatcher {
 	}
 	
 	def makeAjaxProxy(out : PrintWriter) {
-		out.println("var Ajax = {");
+		out.println("AjaxFrame.Ajax = {");
 	    var methods = List[String]();
 	    for((name,value) <- functionList) {
 			value match {
 				case (input : Class[_],output,role,function) => {
 					val json=makeJsonExample(input);
-					val s=name + ": new AjaxCallTemplate('"+name+"',"+Printer.compact(render(json))+")" 
+					val s=name + ": new AjaxFrame.AjaxCallTemplate('"+name+"',"+Printer.compact(render(json))+")" 
 					methods = s :: methods ;
 
 				}

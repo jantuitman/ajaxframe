@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tuitman.ajaxframe</groupId>
-	<artifactId>testproject</artifactId>
-	<packaging>war</packaging>
+	<artifactId>ajaxframe</artifactId>
+	<packaging>jar</packaging>
 	<version>0.1-SNAPSHOT</version>
-	<name>empty test project</name>
+	<name>ajaxframe</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
 		<dependency>
@@ -25,15 +25,21 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		   <groupId>org.tuitman.ajaxframe</groupId>
-		   <artifactId>ajaxframe</artifactId>
-		   <version>0.1-SNAPSHOT</version>
+		   <groupId>net.liftweb</groupId>
+		   <artifactId>lift-json_2.8.1</artifactId>
+		   <version>2.2</version>
 		</dependency>
 		<dependency>
 		   <groupId>net.liftweb</groupId>
 		   <artifactId>lift-mongodb_2.8.1</artifactId>
 		   <version>2.2</version>
 		</dependency>
+				<!-- mongodb -->
+<!--		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.3</version>
+		</dependency> -->
 	</dependencies>
 	<repositories>
 		<repository>
@@ -119,6 +125,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>testproject</finalName>
+		<finalName>ajaxframe</finalName>
 	</build>
 </project>
