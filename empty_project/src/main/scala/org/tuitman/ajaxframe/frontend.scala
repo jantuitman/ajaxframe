@@ -1,4 +1,4 @@
-package org.tuitman.statelesswf.frontend ;
+package org.tuitman.ajaxframe.frontend ;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +16,7 @@ import net.liftweb.json.JsonAST._;
 import net.liftweb.json._;
 import net.liftweb.json.Printer;
 
-import org.tuitman.statelesswf.reflection.Reflection._;
+import org.tuitman.ajaxframe.reflection.Reflection._;
 
 import java.io.PrintWriter;
 import java.io.InputStreamReader;
@@ -76,7 +76,7 @@ class Dispatcher extends Filter {
 		
 		//val finder = ClassFinder()
 		//val classes = finder.getClasses // classes is an Iterator[ClassInfo]
-		//val ajaxClasses=ClassFinder.concreteSubclasses("org.tuitman.statelesswf.Ajax", classes)
+		//val ajaxClasses=ClassFinder.concreteSubclasses("org.tuitman.ajaxframe.Ajax", classes)
 		//ajaxClasses.foreach(println(_))
     }
 

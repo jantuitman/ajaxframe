@@ -1,6 +1,6 @@
 package myapp.ajax;
-import org.tuitman.statelesswf.AjaxClass;
-import org.tuitman.statelesswf.authorisation._;
+import org.tuitman.ajaxframe.AjaxClass;
+import org.tuitman.ajaxframe.authorisation._;
 
 import net.liftweb.mongodb._;
 import net.liftweb.json.JsonDSL._;

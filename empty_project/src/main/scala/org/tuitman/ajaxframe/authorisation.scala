@@ -1,6 +1,6 @@
-package org.tuitman.statelesswf.authorisation;
-import org.tuitman.statelesswf.AjaxClass;
-import org.tuitman.statelesswf.AjaxHttpContext;
+package org.tuitman.ajaxframe.authorisation;
+import org.tuitman.ajaxframe.AjaxClass;
+import org.tuitman.ajaxframe.AjaxHttpContext;
 
 import net.liftweb.mongodb._;
 import net.liftweb.json.JsonDSL._;

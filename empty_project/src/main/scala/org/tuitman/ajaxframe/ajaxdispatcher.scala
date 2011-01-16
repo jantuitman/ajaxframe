@@ -1,4 +1,4 @@
-package org.tuitman.statelesswf;
+package org.tuitman.ajaxframe;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.io.Reader;
@@ -6,12 +6,12 @@ import java.io.InputStreamReader;
 import scala.collection.mutable.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.tuitman.statelesswf.reflection.Reflection._;
+import org.tuitman.ajaxframe.reflection.Reflection._;
 import net.liftweb.json.JsonAST._;
 import net.liftweb.json.Printer;
 
 import java.io.PrintWriter;
-import org.tuitman.statelesswf.authorisation._;
+import org.tuitman.ajaxframe.authorisation._;
 
 
 

@@ -1,4 +1,4 @@
-package org.tuitman.statelesswf.reflection;
+package org.tuitman.ajaxframe.reflection;
 import java.lang.reflect.{Constructor => JConstructor, Field, Type, ParameterizedType}
 
 object Reflection { 

@@ -5,9 +5,11 @@
 	<filter>
 		<display-name>dispatcher</display-name>
 		<filter-name>Dispatcher</filter-name>
-		<filter-class>org.tuitman.statelesswf.Dispatcher</filter-class>
+		<filter-class>org.tuitman.ajaxframe.Dispatcher</filter-class>
 		<init-param>
 			<param-name>ajaxClass</param-name>
+			<param-value>myapp.ajax.Test</param-value>
+			<param-name>configurationClass</param-name>
 			<param-value>myapp.ajax.Test</param-value>
 		</init-param>
 	</filter>
@@ -19,7 +21,7 @@
   <servlet>
        <display-name>ajaxservice</display-name>
        <servlet-name>AjaxService</servlet-name>
-       <servlet-class>org.tuitman.statelesswf.frontend.AjaxService</servlet-class>
+       <servlet-class>org.tuitman.ajaxframe.frontend.AjaxService</servlet-class>
        <load-on-startup>1</load-on-startup>
    </servlet>
    <servlet-mapping>

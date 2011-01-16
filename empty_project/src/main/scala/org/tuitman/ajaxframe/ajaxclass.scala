@@ -1,7 +1,7 @@
-package org.tuitman.statelesswf;
+package org.tuitman.ajaxframe;
 import java.io.Reader;
 import java.lang.reflect.Method;
-import org.tuitman.statelesswf.authorisation.AuthRole;
+import org.tuitman.ajaxframe.authorisation.AuthRole;
 
 
 abstract class AjaxClass {

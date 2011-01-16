@@ -1,4 +1,4 @@
-package org.tuitman.statelesswf;
+package org.tuitman.ajaxframe;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

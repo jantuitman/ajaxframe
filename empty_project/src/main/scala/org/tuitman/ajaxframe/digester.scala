@@ -1,4 +1,4 @@
-package org.tuitman.statelesswf.authorisation;
+package org.tuitman.ajaxframe.authorisation;
 import java.security.MessageDigest;
 
 

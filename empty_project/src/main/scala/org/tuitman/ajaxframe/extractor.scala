@@ -1,4 +1,4 @@
-package org.tuitman.statelesswf;
+package org.tuitman.ajaxframe;
 import java.io.Reader;
 import net.liftweb.json.DefaultFormats;
 import net.liftweb.json.JsonParser._;
