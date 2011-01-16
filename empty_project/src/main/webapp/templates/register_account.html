@@ -1,6 +1,9 @@
-<div id="loginDiv" style="background:white; border:1px solid black; padding:30px; position:absolute; left:150px;top:150px;">
-	<form id="loginform">
+<div style="">
+	<form id="registerform">
 		<table style="width:600px;border-collapse:collapse;border:none;">
+			<tr>
+				<td colspan="2" style=""><h2>%%N_EW_ACCOUNT%%</h2></td>
+			<tr>
 			<tr>
 				<td colspan="2" id="msg" style="color:red;"></td>
 			<tr>
@@ -12,15 +15,12 @@
 				<td><input type="password" id="password" /></td>
 			</tr>
 			<tr>
-				<td colspan="2"><input type="submit" class="submitbutton" value="%%L_OGIN%%" /></td>
+				<td><label for="password2">%%R_ETYPE_PASSWORD%%</label></td>
+				<td><input type="password" id="password2" /></td>
 			</tr>
 			<tr>
-				<td colspan="2"><a href="#" id="forgotPassword">%%F_ORGOTPWD%%</a></td>
-			</tr>
-			<tr>
-				<td colspan="2"><a href="#" id="registerAccount">%%N_EW_ACCOUNT%%</a></td>
+				<td colspan="2"><input type="submit" class="submitbutton" value="%%N_EW_ACCOUNT%%" /></td>
 			</tr>
 		</table>
 	</form>
 </div>
-	

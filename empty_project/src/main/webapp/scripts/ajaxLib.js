@@ -97,7 +97,7 @@ function AuthorisationHandler() {
 
 AuthorisationHandler.prototype.handle403=function(success, error) {
 
-
+    var self=this;
 	Templating.render('login.html',{},function (h) {
 			h.appendTo('body');
 			$('#loginform',h).submit(function () {
@@ -114,8 +114,39 @@ AuthorisationHandler.prototype.handle403=function(success, error) {
 						}
 				)
 				return false;
+			});
+			$("#registerAccount",h).click(function(){
+				self.registerAccount(success,error);
+			})
+			$("#forgotPassword",h).click(function(){
+				self.resetPassword();
 			})
 	})
+}
+
+AuthorisationHandler.prototype.registerAccount=function(success,error) {
+   $("#loginDiv").remove();
+   $("#mainDiv").hide();
+   var self=this;
+   Templating.render('register_account.html',{},function (h) {
+		h.appendTo('body');
+		// to do. add event handling here.
+		$('#registerform',h).submit(function () { 
+			if ($('#password').val() != $('#password2').val()) {
+				$("#msg",h).html("passwords don't match");
+				return false;
+			}  
+			
+			Ajax.registerAccount.call(Templating.extractJson(h,{ 'email': null, 'password': null}),
+				function (result) {
+					alert("register account:"+result.message);
+					h.remove();
+				   	$("#mainDiv").show();
+				}
+			);
+			return false;
+		});	
+	});	
 }
 
 

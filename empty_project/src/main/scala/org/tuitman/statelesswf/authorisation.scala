@@ -47,7 +47,7 @@ class DefaultAuthentication extends AjaxClass {
 			}
 	}
 
-	def register = ajaxContextAwareMethod[AjaxAuthentication,AjaxAuthenticationResponse](AuthRole("none")) {
+	def registerAccount = ajaxContextAwareMethod[AjaxAuthentication,AjaxAuthenticationResponse](AuthRole("none")) {
 		( auth : AjaxAuthentication,ctx: AjaxHttpContext) => AjaxAuthenticationResponse("registered now!")
 		AppUser.find("email" -> auth.email) match {
 			case Some(AppUser(_id,email,digestedPassword,roles)) =>
