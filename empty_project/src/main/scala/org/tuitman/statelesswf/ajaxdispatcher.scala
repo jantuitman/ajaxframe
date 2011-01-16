@@ -158,8 +158,7 @@ class AjaxDispatcher {
 	*/	
 	def makeAjaxConsole(out : PrintWriter) {
 		out.println("<html><head><title>ajaxConsole</title>");
-		out.println("""
-		<script src="/scripts/jquery-1.4.2.js"></script>
+		out.println("""<script src="/scripts/jquery-1.4.2.js"></script>
 		<script src="/scripts/jquery.templ.js"></script>
 		<script src="/scripts/json.js"></script>
 		<script src="/scripts/templating.js"></script>
@@ -172,7 +171,9 @@ class AjaxDispatcher {
 		     }
 		
 		</script>
-		<body>""");
+		<body>
+		<div id="mainDiv">
+		""");
 		out.println("<div><select id=\"functionName\" onchange=\"g_ajaxConsole.loadTemplate(this)\" >")
 		out.println("<option value=\"\" SELECTED>select ajax function</option>");
 		for((name,value) <- functionList) {
@@ -196,7 +197,7 @@ class AjaxDispatcher {
 		<div id="ajaxOutput" ></div>
 		""")
 
-		out.println("</body>");
+		out.println("</div></body>");
 
 	}
 	
