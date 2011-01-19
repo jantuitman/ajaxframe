@@ -192,7 +192,7 @@ class AjaxDispatcher {
 				}
 				case AjaxDescriptor0(input,output,role,function) => {
 					
-					templates ::= "AjaxFrame.Console.addTemplate('"+name+"','{})"
+					templates ::= "AjaxFrame.Console.addTemplate('"+name+"','{}')"
 
 				}
 				case _ => {}
