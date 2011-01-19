@@ -7,7 +7,7 @@ class Test extends AjaxClass {
 
 	MongoDB.defineDb(DefaultMongoIdentifier, MongoAddress(MongoHost("localhost", 27017), "test"))
 
-	val user = classOf[UserCalls];
+	val todo = classOf[ToDoCalls];
 	val defaultAuthentication=classOf[DefaultAuthentication];
 	
 
