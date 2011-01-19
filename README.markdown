@@ -5,6 +5,7 @@ Lift, Wicket, Ruby on Rails, ... are great web frameworks. But all of them have 
 I want to make a client side framework. This is an experimental repository for now. The code is written in scala + javascript and the database is mongodb.I borrow some stuff from the Lift Web Framework (since this is written in scala). 
 
 Finished:
+
 * extremely easy way to make ajax calls, including client side proxy.
 * prove of concept implementation of mongodb serialization.
 * handle default url /
@@ -16,6 +17,7 @@ Finished:
 
 
 Still todo:
+
 * finish the ToDo sample code.
 * looser json deserialisation, supporting untyped collections.
 * generic db code?
@@ -56,7 +58,7 @@ I haven't got nice batch files for windows yet, so there is slightly more typing
 10. xcopy default_webapp\target\generated-sources\archetype default_webapp-archetype
 11. make a small fix in default_webapp-archetype\src\main\resources\archetype-resources\src\main\webapp\WEB-INF\web.xml: 
 
- ${package} should be replaced by org.tuitman.ajaxframe
+    ${package} should be replaced by org.tuitman.ajaxframe
 
 12. cd default_webapp-archetype
 13. mvn install
