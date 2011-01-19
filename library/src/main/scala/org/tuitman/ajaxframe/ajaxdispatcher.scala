@@ -20,7 +20,6 @@ case class AjaxHttpContext(req : HttpServletRequest, resp: HttpServletResponse )
 
 class AjaxDispatcher {
 
-	type AjaxDescriptor = Tuple4[Class[_],Class[_],AuthRole,Function2[Reader,AjaxHttpContext,String]];
 	
 	//private var ajaxInstance : Any = null;
 	private var functionList = new HashMap[String,AjaxDescriptor];
@@ -101,12 +100,17 @@ class AjaxDispatcher {
 			case s : String => {
 				val ctx = AjaxHttpContext(req,resp)
 				functionList(s) match {
-					case (_,_,role,fn : Function2[Reader,AjaxHttpContext,String]) => {
+					case AjaxDescriptor1(inputType,outputType,role,fn) => {
 						withAuthorisation(role,ctx) { ctx : AjaxHttpContext =>
 							resp.getWriter.println(fn(new InputStreamReader(ctx.req.getInputStream()),ctx))	
 						}
 					}
-					case _ => resp.sendError(HttpServletResponse.SC_NOT_FOUND,"this ajaxcall does not exist.");
+					case AjaxDescriptor0(inputType,outputType,role,fn) => {
+						withAuthorisation(role,ctx) { ctx : AjaxHttpContext =>
+							resp.getWriter.println(fn(ctx))	
+						}
+					}
+				case _ => resp.sendError(HttpServletResponse.SC_NOT_FOUND,"this ajaxcall does not exist.");
 				}
 			}
 		}
@@ -180,10 +184,15 @@ class AjaxDispatcher {
 		for((name,value) <- functionList) {
 			out.println("<option value=\""+name+"\">"+name+"</option>");
 			value match {
-				case (input : Class[_],output,role,function) => {
+				case AjaxDescriptor1(input,output,role,function) => {
 					// hmmmm...
 					val json=makeJsonExample(input);
 					templates ::= "AjaxFrame.Console.addTemplate('"+name+"','"+Printer.compact(render(json))+"')"
+
+				}
+				case AjaxDescriptor0(input,output,role,function) => {
+					
+					templates ::= "AjaxFrame.Console.addTemplate('"+name+"','{})"
 
 				}
 				case _ => {}
@@ -210,12 +219,18 @@ class AjaxDispatcher {
 	    var methods = List[String]();
 	    for((name,value) <- functionList) {
 			value match {
-				case (input : Class[_],output,role,function) => {
+				case AjaxDescriptor1(input,output,role,function) => {
 					val json=makeJsonExample(input);
 					val s=name + ": new AjaxFrame.AjaxCallTemplate('"+name+"',"+Printer.compact(render(json))+")" 
 					methods = s :: methods ;
 
 				}
+				case AjaxDescriptor0(input,output,role,function) => {
+					val s=name + ": new AjaxFrame.AjaxCallTemplate('"+name+"',{})" 
+					methods = s :: methods ;
+
+				}
+				
 				case _ => {};
 			}
 		} 

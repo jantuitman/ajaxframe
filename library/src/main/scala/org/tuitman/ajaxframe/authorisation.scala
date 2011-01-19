@@ -27,9 +27,6 @@ object AppUser extends MongoDocumentMeta[AppUser] {
 class DefaultAuthentication extends AjaxClass {
 
 
-
-
-
 	def login  =ajaxContextAwareMethod[AjaxAuthentication,AjaxAuthenticationResponse] (AuthRole("none")) {
 			( auth : AjaxAuthentication, ctx: AjaxHttpContext) => 
 			
@@ -70,8 +67,8 @@ class DefaultAuthentication extends AjaxClass {
 	
 	}
 
-	def logout = ajaxContextAwareMethod[AjaxAuthentication,AjaxAuthenticationResponse](AuthRole("user")) {
-		( v : AjaxAuthentication,ctx: AjaxHttpContext) => 
+	def logout = ajaxContextAwareMethod[AjaxAuthenticationResponse](AuthRole("user")) {
+		(ctx: AjaxHttpContext) => 
 		val session=ctx.req.getSession(true);
 		session.invalidate();		
 		AjaxAuthenticationResponse("logged out now!")
