@@ -8,10 +8,10 @@ import com.mongodb.DBObject;
 import net.liftweb.json.JsonAST.JObject;
 
 case class ToDo(_id : String,description :String, done : Boolean) extends MongoDocument[ToDo] {
-	def meta = ToDo;
+	def meta = ToDoX;
 }
 
-object ToDo extends MongoDocumentMeta[ToDo] {
+object ToDoX extends MongoDocumentMeta[ToDo] {
   override def collectionName = "todo"	
 }
 
@@ -30,7 +30,7 @@ class ToDoCalls extends AjaxClass {
 
 	val allOpenItems = ajaxMethod[ToDo,List[ToDo]] (AuthRole("user")) {
 		( t : ToDo) =>
-		ToDo.findAll("done" -> false);
+		ToDoX.findAll("done" -> false);
 	}
 
 

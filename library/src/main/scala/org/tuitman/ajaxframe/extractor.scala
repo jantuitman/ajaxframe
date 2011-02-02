@@ -9,13 +9,14 @@ import net.liftweb.json.JsonAST.render;
 
 
 
-class JsonExtractor[Input,Output <: AnyRef](implicit mf: Manifest[Input]) {
+class JsonExtractor[Input,Output <: AnyRef](inputClass: Class[_])(implicit mf: Manifest[Input]) {
 	
 	
 	def getInput(is : Reader) : Input = {
 		
-		implicit val formats = net.liftweb.json.DefaultFormats;
-		parse(is).extract[Input](formats,mf);
+		//implicit val formats = net.liftweb.json.DefaultFormats;
+		//parse(is).extract[Input](formats,mf);
+		JsonExtract.extract(parse(is),inputClass).asInstanceOf[Input];
 	}
 	
 	def makeOutput(ret : Any) : String = {

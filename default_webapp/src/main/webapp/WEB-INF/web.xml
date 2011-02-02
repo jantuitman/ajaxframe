@@ -9,8 +9,10 @@
 		<init-param>
 			<param-name>ajaxClass</param-name>
 			<param-value>myapp.ajax.Test</param-value>
+		</init-param>
+		<init-param> 
 			<param-name>configurationClass</param-name>
-			<param-value>myapp.ajax.Test</param-value>
+			<param-value>myapp.ajax.Config</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>

@@ -163,6 +163,25 @@ var x=(function (global) {
 			});	
 		});	
 	}
+	
+	AuthorisationHandler.prototype.resetPassword=function(success,error) {
+	   	$("#loginDiv").remove();
+	   	$("#mainDiv").hide();
+	   	var self=this;
+	   	AjaxFrame.Templating.render('reset_password.html',{},function (h) {
+			h.appendTo('body');
+			$('#resetform',h).submit(function () { 
+				AjaxFrame.Ajax.resetPassword.call(AjaxFrame.Templating.extractJson(h,{ 'email': null}),
+					function (result) {
+						alert("register account:"+result.message);
+						h.remove();
+					   	$("#mainDiv").show();
+					}
+				);
+				return false;
+			});
+		});
+	}
     
 	if (typeof global.AuthorisationHandler == "undefined") global.AuthorisationHandler=AuthorisationHandler;
 	if (typeof global.authorisationHandler == "undefined") global.authorisationHandler=new AuthorisationHandler();

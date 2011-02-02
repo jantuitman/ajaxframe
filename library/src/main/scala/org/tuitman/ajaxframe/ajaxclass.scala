@@ -9,11 +9,11 @@ abstract class AjaxClass {
 	
 	def ajaxMethod[Output <: AnyRef] (role: AuthRole) ( func : () => Output) 
 	    : AjaxDescriptor = {
-			val extractor=new JsonExtractor[Unit,Output];
 			
 		    val applyMethods : Array[Method] = 
 		  		for (method <- func.getClass.getMethods() if method.getName() == "apply" && method.getDeclaringClass == func.getClass 
 		    		) yield method;
+			val extractor=new JsonExtractor[Unit,Output](null);
 		
 		    AjaxDescriptor0(classOf[Unit],applyMethods(0).getReturnType(),role,{
 				 (ctx : AjaxHttpContext) =>
@@ -23,11 +23,11 @@ abstract class AjaxClass {
 	}
 	def ajaxMethod[Input,Output <: AnyRef] (role: AuthRole) ( func : (Input) => Output) (implicit mf : Manifest[Input])
 	    : AjaxDescriptor = {
-			val extractor=new JsonExtractor[Input,Output];
 			
 		    val applyMethods : Array[Method] = for (method <- func.getClass.getMethods() if method.getName() == "apply" && method.getDeclaringClass == func.getClass
 		         && method.getParameterTypes()(0) != classOf[java.lang.Object]
 		    ) yield method;
+			val extractor=new JsonExtractor[Input,Output](applyMethods(0).getParameterTypes()(0));
 		
 			AjaxDescriptor1(applyMethods(0).getParameterTypes()(0),
 		    applyMethods(0).getReturnType(),
@@ -40,11 +40,11 @@ abstract class AjaxClass {
 	def ajaxContextAwareMethod[Output <: AnyRef] (role: AuthRole) ( func : (AjaxHttpContext) => Output) 
 	    : AjaxDescriptor = {
 
-			val extractor=new JsonExtractor[Unit,Output];
 
 		    val applyMethods : Array[Method] = for (method <- func.getClass.getMethods() if method.getName() == "apply" && method.getDeclaringClass == func.getClass
 		         && method.getParameterTypes()(0) != classOf[java.lang.Object]
 		    ) yield method;
+			val extractor=new JsonExtractor[Unit,Output](null);
 		
 			AjaxDescriptor0(applyMethods(0).getParameterTypes()(0),
 		    applyMethods(0).getReturnType(),
@@ -58,11 +58,10 @@ abstract class AjaxClass {
 	def ajaxContextAwareMethod[Input,Output <: AnyRef] (role: AuthRole) ( func : (Input,AjaxHttpContext) => Output) (implicit mf : Manifest[Input])
 	    : AjaxDescriptor = {
 
-			val extractor=new JsonExtractor[Input,Output];
-
 		    val applyMethods : Array[Method] = for (method <- func.getClass.getMethods() if method.getName() == "apply" && method.getDeclaringClass == func.getClass
 		         && method.getParameterTypes()(0) != classOf[java.lang.Object]
 		    ) yield method;
+			val extractor=new JsonExtractor[Input,Output](applyMethods(0).getParameterTypes()(0));
 		
 			AjaxDescriptor1(applyMethods(0).getParameterTypes()(0),
 		    applyMethods(0).getReturnType(),

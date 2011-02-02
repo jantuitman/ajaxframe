@@ -34,6 +34,13 @@
 		   <artifactId>lift-mongodb_2.8.1</artifactId>
 		   <version>2.2</version>
 		</dependency>
+		<!--
+	    <dependency>
+	      <groupId>org.mongodb</groupId>
+	      <artifactId>mongo-java-driver</artifactId>
+	      <version>1.4</version>
+	    </dependency>
+	    -->		
 	</dependencies>
 	<repositories>
 		<repository>

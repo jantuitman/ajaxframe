@@ -1,6 +1,11 @@
 package org.tuitman.ajaxframe.reflection;
 import java.lang.reflect.{Constructor => JConstructor, Field, Type, ParameterizedType}
 
+/**
+ 
+ adapted from liftweb json
+
+*/
 object Reflection { 
     
     import com.thoughtworks.paranamer._

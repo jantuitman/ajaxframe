@@ -27,7 +27,7 @@ class AjaxDispatcher {
 	def init(className : String) : Unit = synchronized {
 		
 		def retrieveMethods(ajaxClass: Class[_],ajaxInstance: Any) : Unit = {
-			val list=List.fromArray(ajaxClass.getMethods());
+			val list=ajaxClass.getMethods().toList;
 			for (method <- list if (method.getDeclaringClass() == ajaxClass)
 			) {
 				println(method.getName());
@@ -60,7 +60,7 @@ class AjaxDispatcher {
 				case r : AuthRole => {
 					val session=ctx.req.getSession(true);
 					session.getAttribute("userRoles") match {
-						case l: List[AuthRole] =>  {
+						case l: List[_] =>  {
 							if (l.contains(role)) {
 								try 
 								{
@@ -126,12 +126,8 @@ class AjaxDispatcher {
 		def makeJsonExample(clazz : Class[_]) : JValue = {
 
 	        def classFromListType(gentype : ParameterizedType) : Class[_] = {
-				if (gentype.toString.endsWith("List")) {
-					throw new RuntimeException("expecting a list class, cant handle "+gentype);
-				}
-				else {
-					gentype.getActualTypeArguments()(0).asInstanceOf[Class[_]];
-				}
+
+				gentype.getActualTypeArguments()(0).asInstanceOf[Class[_]];
 	        }
 
 	        //val methods = for(m <- clazz.getMethods() if (m.getDeclaringClass() == clazz ) yield m;
@@ -144,11 +140,14 @@ class AjaxDispatcher {
 							)
 						);
 					}
-					else if (clss.isInstanceOf[Class[String]]) {
+					else if (clss == classOf[String]) {
 						JField(name,JString("String"))
 					}
-					else if (clss.isInstanceOf[Class[Int]]) {
+					else if (clss == classOf[Int]) {
 						JField(name,JInt(1))
+					}
+					else if (clss == classOf[Boolean]) {
+						JField(name,JBool(true))
 					}
 					else {
 						// object type.
@@ -186,7 +185,16 @@ class AjaxDispatcher {
 			value match {
 				case AjaxDescriptor1(input,output,role,function) => {
 					// hmmmm...
-					val json=makeJsonExample(input);
+					println("input "+input.toString());
+					val json=try {
+						makeJsonExample(input);
+					}
+					catch {
+						case e => {
+							print(e);
+							JObject(Nil);
+						}
+					}
 					templates ::= "AjaxFrame.Console.addTemplate('"+name+"','"+Printer.compact(render(json))+"')"
 
 				}
