@@ -122,7 +122,7 @@ class DefaultAuthentication extends AjaxClass {
 			case Some(x) => {
 				x.copy(password = Digester.sha1digest(newPassword)).save ;
 				Emailer.sendMail(a.email,"Your password was reset",("""|
-					Your password at """+Config.instance.getEmailProperties.getProperty("sitename")+""" was reset. The new password is 
+					|Your password at """+Config.instance.getEmailProperties.getProperty("sitename")+""" was reset. The new password is 
 					|
 					|""").stripMargin+newPassword,
 					None
