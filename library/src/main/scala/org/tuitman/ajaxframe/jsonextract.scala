@@ -28,28 +28,32 @@ object JsonExtract {
 			if (requestedType == classOf[String]) {
 			    v match {
 					case Some(JString(s)) => s;
-					case Some(_) => throw new RuntimeException("String expected for field '"+name+"'");
+					case Some(JNull) => null;
+					case Some(x) => throw new RuntimeException("String expected for field '"+name+"', found "+x+" is null?"+(x==null));
 					case None => null;
 				}
 			}
 			else if (requestedType == classOf[Int]) {
 			    v match {
 					case Some(JInt(i)) => i.asInstanceOf[Object];
+					case Some(JNull) => 0.asInstanceOf[AnyRef]
 					case Some(_) => throw new RuntimeException("Int expected for field '"+name+"'");
-					case None => null;
+					case None => 0.asInstanceOf[AnyRef];
 				}
 			}
 			else if (requestedType == classOf[Boolean]) {
 			    v match {
 					case Some(JBool(b)) => b.asInstanceOf[Object];
+					case Some(JNull) => false.asInstanceOf[AnyRef];
 					case Some(_) => throw new RuntimeException("Bool expected for field '"+name+"'");
-					case None => null;
+					case None => false.asInstanceOf[AnyRef];
 				}
 			}
 			else {
 				// class is another object, so recursively invoke extract.
 				v match {
 					case Some(x: JObject) => extract(x,requestedType);
+					case Some(JNull) => null;
 					case None => null;
 					case Some(_) => throw new RuntimeException("Json object expected for field '"+name+"'");
 				}
@@ -61,6 +65,8 @@ object JsonExtract {
 	    json match {
 			case JObject(fields: List[_]) => {
 				val params : List[AnyRef]=for ( (name,clss,genericType) <- primaryConstructorArgs(returnType)) yield {
+					
+					//println(" parameter "+name);
 					val v=fieldValue(fields,name);
 					if (genericType.isInstanceOf[ParameterizedType]) {
 						 //println("Parameterized type found type found in constructor args: ownertype "+genericType.asInstanceOf[ParameterizedType].getOwnerType().toString())
@@ -97,6 +103,7 @@ object JsonExtract {
 				//var y : Array[AnyRef]=new Array[AnyRef](params.length);
 				//for (i <- 0 to (y.length)) y(i)=params(i);
 				val cc : Constructor[_]=returnType.getDeclaredConstructors()(0);
+				//println(" we are going to construct with params "+params);
 				cc.newInstance(params.toArray[Object] : _*).asInstanceOf[AnyRef];
 			}
 			case _ => throw new RuntimeException("expected json object, found array or primitive.");
